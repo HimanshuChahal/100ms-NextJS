@@ -19,7 +19,7 @@ export const Conference = () => {
   const history = useHistory();
   const { roomId, role } = useParams();
   const context = useContext(AppContext);
-  const [isChatOpen, setIsChatOpen] = useState(false);
+  const [isChatOpen, setIsChatOpen] = useState(true);
   const [isParticipantListOpen, setIsParticipantListOpen] = useState(false);
   const toggleChat = useCallback(() => {
     setIsChatOpen(open => !open);

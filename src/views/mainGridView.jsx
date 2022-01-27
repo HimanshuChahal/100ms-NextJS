@@ -2,7 +2,9 @@ import React, { useContext } from "react";
 import {
   selectLocalPeerID,
   selectPeers,
+  selectLocalPeer,
   useHMSStore,
+  useHMSActions
 } from "@100mslive/hms-video-react";
 import { Flex } from "@100mslive/react-ui";
 import { GridCenterView, GridSidePaneView } from "./components/gridView";
@@ -24,6 +26,23 @@ export const MainGridView = ({
   const sidebarPeers = peers.filter(peer =>
     sidepaneRoles.includes(peer.roleName)
   );
+  const hmsActions = useHMSActions()
+  const localPeer = useHMSStore(selectLocalPeer)
+
+  React.useEffect(() => {
+
+    if(localPeer.roleName === 'client')
+    {
+      setTimeout(() => {
+
+        (async () => {
+          await hmsActions.sendBroadcastMessage('Message sent')
+        })()
+  
+      }, 5000)
+    }
+
+  }, [])
 
   /**
    * If there are peers from many publishing roles, then it's possible to divide
@@ -65,6 +84,7 @@ export const MainGridView = ({
         isParticipantListOpen={isParticipantListOpen}
         totalPeers={peers.length}
         videoTileProps={videoTileProps}
+        localPeer = { localPeer }
       />
       {showSidePane && (
         <GridSidePaneView
@@ -74,6 +94,7 @@ export const MainGridView = ({
           isParticipantListOpen={isParticipantListOpen}
           totalPeers={peers.length}
           videoTileProps={videoTileProps}
+          localPeer = { localPeer }
         />
       )}
     </Flex>

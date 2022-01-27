@@ -18,6 +18,7 @@ import {
   selectVideoPlaylist,
   VideoPlaylist,
   selectIsConnectedToRoom,
+  selectLocalPeer
 } from "@100mslive/hms-video-react";
 import { MoreSettings } from "./components/MoreSettings";
 import { AudioVideoToggle } from "./components/AudioVideoToggle";
@@ -40,6 +41,8 @@ export const ConferenceFooter = ({ isChatOpen, toggleChat }) => {
   const activeVideoPlaylist = useHMSStore(selectVideoPlaylist.selection).id;
   const [shareAudioModal, setShareAudioModal] = useState(false);
   const { isHandRaised, setIsHandRaised } = useMetadata();
+
+  const localPeerRole = useHMSStore(selectLocalPeer)
 
   const initialModalProps = {
     show: false,
@@ -90,7 +93,7 @@ export const ConferenceFooter = ({ isChatOpen, toggleChat }) => {
 
   if (isAllowedToPublish.screen && isScreenshareSupported()) {
     leftComponents.push(
-      <Tooltip
+      false && <Tooltip
         title={`${!isAudioScreenshare ? "Start" : "Stop"} audio sharing`}
         key="shareAudio"
       >
@@ -108,31 +111,33 @@ export const ConferenceFooter = ({ isChatOpen, toggleChat }) => {
           <MusicIcon />
         </IconButton>
       </Tooltip>,
-      <Box key="audioShareDivider" css={{ "@md": { display: "none" } }}>
+      false && <Box key="audioShareDivider" css={{ "@md": { display: "none" } }}>
         <VerticalDivider />
       </Box>
     );
   }
   leftComponents.push(
-    <Button
-      key="chat"
-      iconOnly
-      variant="no-fill"
-      iconSize="md"
-      shape="rectangle"
-      onClick={toggleChat}
-      active={isChatOpen}
-    >
-      {countUnreadMessages === 0 ? <ChatIcon /> : <ChatUnreadIcon />}
-    </Button>
+    localPeerRole.roleName === 'trainer' && false && (
+      <Button
+        key="chat"
+        iconOnly
+        variant="no-fill"
+        iconSize="md"
+        shape="rectangle"
+        onClick={toggleChat}
+        active={isChatOpen}
+      >
+        {countUnreadMessages === 0 ? <ChatIcon /> : <ChatUnreadIcon />}
+      </Button>
+  )
   );
-  isAllowedToPublish.screen &&
+  isAllowedToPublish.screen && false &&
     leftComponents.push(
       <Box css={{ "@md": { display: "none" } }} key="audioPlaylist">
         <AudioPlaylist />
       </Box>
     );
-  isAllowedToPublish.screen &&
+  isAllowedToPublish.screen && false &&
     leftComponents.push(
       <Box css={{ "@md": { display: "none" } }} key="videoPlaylistIcon">
         <VideoPlaylist
@@ -143,17 +148,19 @@ export const ConferenceFooter = ({ isChatOpen, toggleChat }) => {
       </Box>
     );
   leftComponents.push(
-    <Tooltip
-      title={`${!isHandRaised ? "Raise" : "Unraise"} hand`}
-      key="raise-hand"
-    >
-      <IconButton
-        onClick={() => setIsHandRaised(!isHandRaised)}
-        active={!isHandRaised}
+    false && (
+      <Tooltip
+        title={`${!isHandRaised ? "Raise" : "Unraise"} hand`}
+        key="raise-hand"
       >
-        <HandIcon />
-      </IconButton>
-    </Tooltip>
+        <IconButton
+          onClick={() => setIsHandRaised(!isHandRaised)}
+          active={!isHandRaised}
+        >
+          <HandIcon />
+        </IconButton>
+      </Tooltip>
+    )
   );
 
   const isPublishing = isAllowedToPublish.video || isAllowedToPublish.audio;
@@ -167,7 +174,7 @@ export const ConferenceFooter = ({ isChatOpen, toggleChat }) => {
         leftComponents={leftComponents}
         centerComponents={[
           <AudioVideoToggle key="audioVideoToggle" />,
-          isAllowedToPublish.screen && isScreenshareSupported() ? (
+          isAllowedToPublish.screen && isScreenshareSupported() && false ? (
             <Tooltip
               title={`${!isScreenShared ? "Start" : "Stop"} screen sharing`}
               key="toggleScreenShare"
@@ -182,17 +189,17 @@ export const ConferenceFooter = ({ isChatOpen, toggleChat }) => {
             </Tooltip>
           ) : null,
           isAllowedToPublish.video ? <VirtualBackground key="vb" /> : null,
-          isAllowedToPublish.audio ? (
+          isAllowedToPublish.audio && false ? (
             <NoiseSuppression key="noiseSupression" />
           ) : null,
           isPublishing && (
             <span key="SettingsLeftSpace" className="mx-2 md:mx-3"></span>
           ),
-          isPublishing && <VerticalDivider key="SettingsDivider" />,
+          isPublishing && false && <VerticalDivider key="SettingsDivider" />,
           isPublishing && (
             <span key="SettingsRightSpace" className="mx-2 md:mx-3"></span>
           ),
-          <MoreSettings key="MoreSettings" />,
+          false && (<MoreSettings key="MoreSettings" />),
         ]}
         rightComponents={[<LeaveRoom key="leaveRoom" />]}
       />

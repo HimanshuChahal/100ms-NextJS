@@ -202,7 +202,7 @@ export const ConferenceHeader = ({ onParticipantListOpen }) => {
   const { HLS_VIEWER_ROLE } = useContext(AppContext);
   const localPeer = useHMSStore(selectLocalPeer);
   return (
-    <>
+    false && <>
       <Header
         leftComponents={[
           <LogoButton key={0} />,

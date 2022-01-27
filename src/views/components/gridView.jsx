@@ -1,8 +1,10 @@
-import React, { Fragment } from "react";
+import React, { Fragment, useState } from "react";
 import {
   VideoList,
   FirstPersonDisplay,
   isMobileDevice,
+  selectHMSMessages,
+  useHMSStore
 } from "@100mslive/hms-video-react";
 import { Box, Flex } from "@100mslive/react-ui";
 import { ChatView } from "./chatView";
@@ -20,6 +22,8 @@ const eventsImg = webinarProps?.IMAGE_FILE || ""; // the image to show in center
 // the link to navigate to when user clicks on the image
 const webinarInfoLink = webinarProps?.LINK_HREF || "https://100ms.live/";
 
+var timeout = null
+
 // The center of the screen shows bigger tiles
 export const GridCenterView = ({
   peers,
@@ -31,7 +35,32 @@ export const GridCenterView = ({
   hideSidePane,
   totalPeers,
   videoTileProps = () => ({}),
+  localPeer
 }) => {
+
+  const [ openChat, setOpenChat ] = useState(false)
+
+  const hmsMessages = useHMSStore(selectHMSMessages)
+
+  React.useEffect(() => {
+
+    if(hmsMessages.length > 0)
+    {
+      setOpenChat(true)
+
+      if(timeout)
+      {
+        clearTimeout(timeout)
+        timeout = null
+      }
+      
+      timeout = setTimeout(() => {
+        setOpenChat(false)
+      }, 10000)
+    }
+
+  }, [ hmsMessages ])
+
   return (
     <Fragment>
       <Box
@@ -67,7 +96,7 @@ export const GridCenterView = ({
           <FirstPersonDisplay classes={{ rootBg: "h-full" }} />
         )}
       </Box>
-      {isChatOpen && hideSidePane && (
+      {isChatOpen && hideSidePane && localPeer.roleName === 'trainer' && openChat && (
         <Flex
           className={`${getBlurClass(isParticipantListOpen, totalPeers)}`}
           css={{
@@ -83,7 +112,9 @@ export const GridCenterView = ({
             },
           }}
         >
-          <ChatView toggleChat={toggleChat} />
+          <ChatView toggleChat = {() => {
+            //toggleChat
+          }} />
         </Flex>
       )}
     </Fragment>
@@ -98,7 +129,13 @@ export const GridSidePaneView = ({
   isParticipantListOpen,
   totalPeers,
   videoTileProps = () => ({}),
+  localPeer
 }) => {
+
+  const [ openChat, setOpenChat ] = useState(false)
+
+  const hmsMessages = useHMSStore(selectHMSMessages)
+
   const { width } = useWindowSize();
   let rows = undefined;
   if (width < 768) {
@@ -106,6 +143,25 @@ export const GridSidePaneView = ({
   } else if (width === 768) {
     rows = 1;
   }
+
+  React.useEffect(() => {
+
+    if(hmsMessages.length > 0)
+    {
+      setOpenChat(true)
+
+      if(timeout)
+      {
+        clearTimeout(timeout)
+        timeout = null
+      }
+      
+      timeout = setTimeout(() => {
+        setOpenChat(false)
+      }, 10000)
+    }
+
+  }, [ hmsMessages ])
 
   return (
     <Flex
@@ -136,7 +192,7 @@ export const GridSidePaneView = ({
           />
         )}
       </Flex>
-      {isChatOpen && (
+      {isChatOpen && localPeer.roleName === 'trainer' && openChat && (
         <Flex
           className={`${getBlurClass(isParticipantListOpen, totalPeers)}`}
           align="end"
@@ -151,7 +207,9 @@ export const GridSidePaneView = ({
             },
           }}
         >
-          <ChatView toggleChat={toggleChat} />
+          <ChatView toggleChat={() => {
+            //toggleChat
+          }} />
         </Flex>
       )}
     </Flex>
